@@ -2,19 +2,19 @@
 # 🤖Telegram keyword alert bot ⏰
 
 
-用于提醒 频道/群组 关键字消息
+For alert Channel/Group Keyword messages
 
-如果想订阅`群组`消息，确保普通TG账户加入该群组不需要验证。
+If you want to subscribe to `group` messages, make sure normal TG accounts do not need to authenticate to join the group.
 
-原理：tg命令行客户端来监听消息，使用bot来发送消息给订阅用户。
+Principle: tg command line client to listen for messages and use bot to send messages to subscribed users.
 
 👉  Features：
 
-- [x] 关键字消息订阅：根据设定的关键字和频道来发送新消息提醒
-- [x] 支持正则表达式匹配语法
-- [x] 支持多频道订阅 & 多关键字订阅
-- [x] 支持订阅群组消息
-- [x] 支持私有频道ID/邀请链接的消息订阅 
+- [x] Keyword message subscription: send new message alerts based on set keywords and channels
+- [x] Support for regular expression matching syntax
+- [x] Support multi-channel subscription & multi-keyword subscription
+- [x] Support for subscribing to group messages
+- [x] Support private channel ID/invite link for message subscription 
 
   1. https://t.me/+B8yv7lgd9FI0Y2M1  
   2. https://t.me/joinchat/B8yv7lgd9FI0Y2M1 
@@ -22,10 +22,10 @@
 
 👉 Todo:
 
-- [ ] 私有群组订阅和提醒
-- [ ] 私有频道消息提醒完整内容预览
-- [ ] 多账号支持
-- [ ] 扫描退出无用频道/群组
+- [ ] Private group subscriptions and alerts
+- [ ] Private channel message alert full content preview
+- [ ] Multi-account support
+- [ ] Scan out of useless channels/groups
 
 # DEMO
 
@@ -36,28 +36,27 @@ http://t.me/keyword_alert_bot
 
 # USAGE
 
-## 普通关键字匹配
+## General keyword matching
 
 ```
-/subscribe   免费     https://t.me/tianfutong
-/subscribe   优惠券   https://t.me/tianfutong
+/subscribe  Free    https://t.me/tianfutong
+/subscribe  Coupons https://t.me/tianfutong
 
 ```
 
-## 正则表达式匹配
+## Regular expression matching
 
-使用js正则语法规则，用/包裹正则语句，目前可以使用的匹配模式：i,g
+Use js regular syntax rules, wrap the regular statement with /, the current match pattern can be used: i,g
 
 ```
-# 订阅手机型号关键字：iphone x，排除XR，XS等型号，且忽略大小写
+# Subscribe to the phone model keywords: iphone x, excluding XR, XS and other models, and ignore the case
 /subscribe   /(iphone\s*x)(?:[^sr]|$)/ig  com9ji,xiaobaiup
 /subscribe   /(iphone\s*x)(?:[^sr]|$)/ig  https://t.me/com9ji,https://t.me/xiaobaiup
 
-# xx券
-/subscribe  /([\S]{2}券)/g  https://t.me/tianfutong
+# test
+/subscribe  /([\S]{2}test)/g  https://t.me/<telegram-channel>
 
 ```
-
 
 
 ## BUILD
@@ -66,7 +65,7 @@ http://t.me/keyword_alert_bot
 
 #### Create Telelgram Account & API
 
-[开通api](https://my.telegram.org/apps) 建议请使用新注册的Telegram账户
+[Open api](https://my.telegram.org/apps) We recommend that you use a newly registered Telegram account.
 
 #### Create BOT 
 
@@ -74,9 +73,9 @@ https://t.me/BotFather
 
 ### 2. RUN
 
-运行环境 python3.7+
+Runtime environment python3.7+
 
-首次运行需要用tg账户接收数字验证码，且输入密码（telegram API触发）
+The first run requires a tg account to receive a digital verification code and enter a password (telegram API trigger)
 
 ```
 $ pipenv install
@@ -90,7 +89,7 @@ $ python3 ./main.py
 
  - update telethon
 
-依赖库telethon可能会有旧版本不可用的情况或者其他BUG，请最好是通过定时任务去执行依赖更新。
+Dependency library telethon may have old versions unavailable or other bugs, please preferably perform dependency updates via timed tasks.
 
 e.g. 
 ```
@@ -99,14 +98,13 @@ e.g.
 
 ## BUG Q&A
 
- - 查看日志发现个别群组无法接收消息，软件客户端正常接收
- 
- 请尝试更新telethon解决问题🤔，我也很无助。
+- Check the logs and found that individual groups cannot receive messages, the software client receives them normally
 
- - 订阅群组消息，机器人没任何反应
- https://github.com/Hootrix/keyword_alert_bot/issues/20
+Please try to update telethon to solve the problem 🤔 I am also very helpless.
+- Subscribe to group messages, the robot does not respond
 
- - ModuleNotFoundError: No module named 'asyncstdlib', No module named '...'
+https://github.com/Hootrix/keyword_alert_bot/issues/20
+- ModuleNotFoundError: No module named 'asyncstdlib', No module named '...'
 
 ```
 $ pipenv  install
@@ -116,21 +114,21 @@ $ pipenv  install
 
 ```
 
-目的：根据关键字订阅频道消息
+Purpose: Subscribe channel news according to keywords
 
-支持多关键字和多频道订阅，使用英文逗号`,`间隔
+Support multi-keyword and multi-channel subscription, using English comma `,` interval
 
-关键字和频道之间使用空格间隔
+Use spaces between keywords and channels
 
-主要命令：
+Main orders:
 
-/subscribe - 订阅操作： `关键字1,关键字2 https://t.me/tianfutong,https://t.me/xiaobaiup`
+/subscribe - subscribe operation: `Keyword1,Keyword2 https://t.me/<telegram-channel>,https://t.me/<telegram-channel>`
 
-/unsubscribe - 取消订阅： `关键字1,关键字2 https://t.me/tianfutong,https://t.me/xiaobaiup`
+/unsubscribe - unsubscribe: `Keyword1, Keyword2 https://t.me/<telegram-channel>,https://t.me/<telegram-channel>`
 
-/unsubscribe_all - 取消所有订阅
+/unsubscribe_all - unsubscribe from all
 
-/list - 显示所有订阅列表
+/list - Show list of all subscriptions
 
 ---
 
