@@ -153,7 +153,7 @@ async def on_greeting(event):
       raise events.StopPropagation
 
     if event.chat.username == account['bot_name']: # Do not listen to current bot messages
-      logger.debug(f'不监听当前机器人消息, event.chat.username: { event.chat.username }')
+      logger.debug(f'Do not listen to current bot messages, event.chat.username: { event.chat.username }')
       raise events.StopPropagation
 
     # Whether to reject messages from other bots in the group
@@ -488,7 +488,7 @@ async def leave_channel(channel_name):
       await client(LeaveChannelRequest(channel_name))
       await client(DeleteChannelRequest(channel_name))
       await client(DeleteHistoryRequest(channel_name))
-      logger.info(f'退出 {channel_name}')
+      logger.info(f'Exit {channel_name}')
   except Exception as _e: # 不存在的频道
       return f'Unable to exit the channel：{channel_name}, {_e}'
       
@@ -551,14 +551,14 @@ async def subscribe(event):
   chat_id = event.message.chat.id
   find = utils.db.user.get_or_none(chat_id=chat_id)
   user_id = find
-  if not find:# 不存在用户信息
+  if not find:# No user information exists
     await event.respond('Failed. Please input /start')
     raise events.StopPropagation
   
   text = event.message.text
-  text = text.replace('，',',')# 替换掉中文逗号
-  text = regex.sub('\s*,\s*',',',text) # 确保英文逗号间隔中间都没有空格  如 "https://t.me/xiaobaiup, https://t.me/com9ji"
-  splitd = [i for i in regex.split('\s+',text) if i]# 删除空元素
+  text = text.replace('，',',')# Replace the Chinese comma
+  text = regex.sub('\s*,\s*',',',text) # Make sure there are no spaces between the English commas  如 "https://t.me/xiaobaiup, https://t.me/com9ji"
+  splitd = [i for i in regex.split('\s+',text) if i]# Delete empty elements
   if len(splitd) <= 1:
     await event.respond('Enter the keywords you need to subscribe to, support js regular syntax：`/[\s\S]*/ig`\n\nInput the keyword that needs to subscribe, support JS regular syntax：`/[\s\S]*/ig`')
     cache.set('status_{}'.format(chat_id),{'current_status':'/subscribe keywords','record_value':text},expire=5*60) #Expires after 5m setting
@@ -567,7 +567,7 @@ async def subscribe(event):
     result = await join_channel_insert_subscribe(user_id,parse_full_command(command, keywords, channels))
     if isinstance(result,str): 
         logger.error('join_channel_insert_subscribe Error：'+result)
-        await event.respond(result,parse_mode = None) # 提示错误消息
+        await event.respond(result,parse_mode = None) # Prompt error message
     else:
       msg = ''
       for key,channel,_chat_id in result:
@@ -579,7 +579,7 @@ async def subscribe(event):
         msg += f'keyword:{key}  channel:{channel}\n'
       if msg:
         msg = 'success subscribe:\n'+msg 
-        text, entities = html.parse(msg)# 解析超大文本 分批次发送 避免输出报错
+        text, entities = html.parse(msg)# Parse oversized text and send it in batches to avoid output errors
         for text, entities in telethon_utils.split_text(text, entities):
           await event.respond(text,formatting_entities=entities) 
         #await event.respond('success subscribe:\n'+msg,parse_mode = None)
@@ -597,7 +597,7 @@ async def unsubscribe_all(event):
     raise events.StopPropagation
   user_id = find.id
   
-  # 查找当前的订阅数据
+  # Find the current subscription data
   _user_subscribe_list = utils.db.connect.execute_sql('select keywords,channel_name,chat_id from user_subscribe_list where user_id = %d and status  = %d' % (user_id,0) ).fetchall()
   if _user_subscribe_list:
     msg = ''
@@ -605,8 +605,8 @@ async def unsubscribe_all(event):
       channel_url = get_channel_url(channel_name,chat_id)
       msg += 'keyword: {}\nchannel: {}\n---\n'.format(keywords,channel_url)
 
-    re_update = utils.db.user_subscribe_list.update(status = 1 ).where(utils.User_subscribe_list.user_id == user_id)#更新状态
-    re_update = re_update.execute()# 更新成功返回1，不管是否重复执行
+    re_update = utils.db.user_subscribe_list.update(status = 1 ).where(utils.User_subscribe_list.user_id == user_id)#Update Status
+    re_update = re_update.execute()# Returns 1 for a successful update, regardless of whether it is repeated
     if re_update:
       await event.respond('success unsubscribe_all:\n' + msg,link_preview = False,parse_mode = None)
   else:
@@ -622,12 +622,12 @@ async def unsubscribe_id(event):
   chat_id = event.message.chat.id
   find = utils.db.user.get_or_none(chat_id=chat_id)
   user_id = find
-  if not find:# 不存在用户信息
+  if not find:# No user information exists
     await event.respond('Failed. Please input /start')
     raise events.StopPropagation
   text = event.message.text
-  text = text.replace('，',',')# 替换掉中文逗号
-  text = regex.sub('\s*,\s*',',',text) # 确保英文逗号间隔中间都没有空格  如 "https://t.me/xiaobaiup, https://t.me/com9ji"
+  text = text.replace('，',',')# Replace the Chinese comma
+  text = regex.sub('\s*,\s*',',',text) # Make sure there are no spaces between the commas, e.g. "https://t.me/xiaobaiup, https://t.me/com9ji"
   splitd = [i for i in regex.split('\s+',text) if i]# 删除空元素
   if len(splitd) > 1:
     ids = [int(i) for i in splitd[1].split(',') if i.isnumeric()]
