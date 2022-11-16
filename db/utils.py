@@ -1,6 +1,6 @@
 #coding=utf-8
 """
-数据库操作类
+Database operation class
 """
 import logging,sys,os,datetime
 import re
@@ -17,13 +17,13 @@ _current_path = os.path.dirname(os.path.realpath(__file__))
 
 _path = '{}/.db'.format(_current_path)
 
-# 本地 执行sqlite写入
+# Local Execute sqlite writes
 _connect = SqliteDatabase(_path)
 
 _connect.is_closed() and _connect.connect()
 
 class _Base(Model):
-  # #将表和数据库连接
+  # Connect the table to the database
   class Meta:
       database = _connect
 
@@ -36,31 +36,31 @@ class User(_Base):
 
   class Meta:
         indexes = (
-          #  (('字段1', '字段2'), True),    # 字段1与字段2整体作为索引，True 代表唯一索引
-          # (('字段1', '字段2'), False),   # 字段1与字段2整体作为索引，False 代表普通索引
-            # (('price','type','time'), False), # 联合索引
+          # (('Field1', 'Field2'), True), # Field1 and Field2 as a whole as an index, True for a unique index
+          # (('field1', 'field2'), False), # field1 and field2 as a whole as an index, False means normal index
+            # (('price','type','time'), False), # Joint index
         )
 
 class User_subscribe_list(_Base):
   """
-  用户订阅表
+  User subscription form
   user_subscribe_list
   id user_id channel_name keywords status create_time
   """
   user_id = IntegerField(index=True)
-  channel_name = CharField(50,null=False)# 频道名称
+  channel_name = CharField(50,null=False)# Channel Name
   
   # https://docs.telethon.dev/en/latest/concepts/chats-vs-channels.html#channels
-  chat_id = CharField(50,null=False,default='')# 频道的非官方id。 e.g. -1001630956637
+  chat_id = CharField(50,null=False,default='')# Unofficial id of the channel. e.g. -1001630956637
 
   keywords = CharField(120,null=False)# 
-  status = SmallIntegerField(default=0)# 0 正常 1删除
+  status = SmallIntegerField(default=0)# 0 Normal 1 Delete
   create_time = DateTimeField('%Y-%m-%d %H:%M:%S',null=True)
   
 
 class _Db:
   def __init__(self):
-    #创建实例类
+    #Creating an instance class
     init_class = [
       User,
       User_subscribe_list
@@ -68,16 +68,16 @@ class _Db:
     for model_class in init_class:
       try:
         model = model_class()
-        model.table_exists() or (model.create_table()) #不存在 则创建表
+        model.table_exists() or (model.create_table()) #Does not exist then create table
         
-        # 执行空查询(检测字段缺失的报错 )
+        # Execute a null query (detects errors for missing fields)
         model.get_or_none(0)
 
         setattr(self,model_class.__name__.lower(),model)
       except OperationalError as __e:
         _e = str(__e)
 
-        # 处理字段不存在的报错
+        # Handle error reporting for non-existent fields
         if 'no such column' in _e:
           find = re.search('no such column: (?:\w+\.)([a-z_0-9]+)$',_e)
           if find:
@@ -89,7 +89,7 @@ class _Db:
 
   def add_column(slef,table,field):
     '''
-    动态添加字段
+    Add fields dynamically
 
     https://stackoverflow.com/questions/35012012/peewee-adding-columns-on-demand
 
